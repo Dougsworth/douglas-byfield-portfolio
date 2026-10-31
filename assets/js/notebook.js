@@ -62,15 +62,21 @@
       var h1 = hero.querySelector('h1');
       var tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
       tl.from('.top', { y: -40, opacity: 0, duration: 0.9 }, 0);
-      var s = h1 && splitLines(h1);
-      if (s) tl.from(s.lines, { yPercent: 115, duration: 1.15, stagger: 0.12, onComplete: function () { s.revert(); } }, 0.15);
+      var leadAt = 0.55;
+      if (h1 && h1.hasAttribute('data-write') && window.sketchbook && window.sketchbook.writeHero) {
+        var wrote = window.sketchbook.writeHero(h1, tl, 0.2);
+        leadAt = Math.max(0.55, 0.2 + wrote - 0.9);
+      } else {
+        var s = h1 && splitLines(h1);
+        if (s) tl.from(s.lines, { yPercent: 115, duration: 1.15, stagger: 0.12, onComplete: function () { s.revert(); } }, 0.15);
+      }
       var lead = hero.querySelector('.lead, .eyebrow');
       if (lead) {
         var sl = splitLines(lead);
-        tl.from(sl ? sl.lines : lead, { yPercent: sl ? 110 : 0, opacity: sl ? 1 : 0, duration: 1, stagger: 0.06, onComplete: function () { if (sl) sl.revert(); } }, 0.55);
+        tl.from(sl ? sl.lines : lead, { yPercent: sl ? 110 : 0, opacity: sl ? 1 : 0, duration: 1, stagger: 0.06, onComplete: function () { if (sl) sl.revert(); } }, leadAt);
       }
       var ctas = hero.querySelectorAll('.ctas .btn');
-      if (ctas.length) tl.from(ctas, { y: 24, opacity: 0, duration: 0.8, stagger: 0.1 }, 0.85);
+      if (ctas.length) tl.from(ctas, { y: 24, opacity: 0, duration: 0.8, stagger: 0.1 }, leadAt + 0.3);
       var pol = hero.querySelector('.polaroid');
       if (pol) tl.fromTo(pol, { y: 70, rotation: -7, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 1.4, ease: 'expo.out' }, 0.1);
       var tag = hero.querySelector('.cs-tag');
@@ -79,7 +85,7 @@
     }
     }
 
-    /* opening screen: her name card, the scribble draws, then the panel lifts away */
+    /* opening screen: the name card, the scribble draws, then the panel lifts away */
     var intro = document.querySelector('.intro');
     var introOn = intro && getComputedStyle(intro).display !== 'none';
     if (introOn) {
@@ -103,7 +109,7 @@
     }
 
     /* section headings reveal line by line */
-    document.querySelectorAll('main h2, .proj h3, .screen h3').forEach(function (h) {
+    document.querySelectorAll('main h2, .proj h3, .screen h3, .xp-card h3').forEach(function (h) {
       if (hero && hero.contains(h)) return;
       var sp = splitLines(h); if (!sp) return;
       gsap.from(sp.lines, { yPercent: 115, duration: 1.05, stagger: 0.1, ease: 'power4.out',
